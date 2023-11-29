@@ -1,7 +1,9 @@
-import React, {useState} from 'react'
-import {DragDropContext, Draggable, Droppable} from 'react-beautiful-dnd'
+import React from 'react'
 
-export default function List({todoData, setTodoData}) {
+export default function List({
+    id,title, completed, todoData, setTodoData, provided, snapshot
+}) {
+
     const handleClick = (id) => {
         let newTodoData = todoData.filter(v => v.id !== id);
         setTodoData(newTodoData)
@@ -16,52 +18,19 @@ export default function List({todoData, setTodoData}) {
         setTodoData(newTodoData)
     }
 
-    const handleEnd = (result) => {
-
-        if(!result.destination) return
-
-        const newTodoData = todoData
-
-        //기존 요소 삭제
-        const [reorderItem] = newTodoData.splice(result.source.index, 1)
-
-        //드래그한 요소 추가
-        newTodoData.splice(result.destination.index, 0, reorderItem)
-        setTodoData(newTodoData)
-    }
-
     return (
         <div>
-            <DragDropContext onDragEnd={handleEnd}>
-                <Droppable droppableId="todo">
-                    {(provided) => (
-                        <div {...provided.droppableProps} ref={provided.innerRef}>
-                            {todoData.map((data,index) => (
-                                <Draggable
-                                    key={data.id}
-                                    draggableId={data.id.toString()}
-                                    index={index}
-                                >
-                                    {(provided, snapshot)=>(
-                                        <div key={data.id} {...provided.draggableProps} ref={provided.innerRef} {...provided.dragHandleProps}
-                                             className={`${snapshot.isDragging ? "bg-gray-400": "bg-gray-100"} flex items-center justify-between w-full px-4 py-1 my-2 text-gray-600 border rounded`}
-                                        >
-                                            <div className="items-center">
-                                                <input type="checkbox" defaultChecked={false} onChange={ () => handleCompleteChange(data.id)}/>
-                                                <span className={data.completed ? "line-through": undefined} >{data.title}</span>
-                                            </div>
-                                            <div className="items-center">
-                                                <button className="px-4 py-2 float-right" onClick={ () => handleClick(data.id)}>x</button>
-                                            </div>
-                                        </div>
-                                    )}
-                                </Draggable>
-                            ))}
-                            {provided.placeholder}
-                        </div>
-                    )}
-                </Droppable>
-            </DragDropContext>
+            <div key={id} {...provided.draggableProps} ref={provided.innerRef} {...provided.dragHandleProps}
+                 className={`${snapshot.isDragging ? "bg-gray-400": "bg-gray-100"} flex items-center justify-between w-full px-4 py-1 my-2 text-gray-600 border rounded`}
+            >
+                <div className="items-center">
+                    <input type="checkbox" defaultChecked={false} onChange={ () => handleCompleteChange(id)}/>
+                    <span className={completed ? "line-through": undefined} >{title}</span>
+                </div>
+                <div className="items-center">
+                    <button className="px-4 py-2 float-right" onClick={ () => handleClick(id)}>x</button>
+                </div>
+            </div>
         </div>
     )
 }
